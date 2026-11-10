@@ -3,7 +3,7 @@
 Build robots from conveyor parts, earn coins, and steal from other players' bases.
 
 Everything is Luau. You do **not** need to model anything to get started: the scripts build a
-grey-box map and the whole UI for you. Later you can replace the map with your own (see
+map and the whole UI for you. Later you can edit the map or replace it with your own (see
 [Building your own map](#building-your-own-map)).
 
 > **Status:** every script passes a Luau syntax check, but it has **not been run inside Roblox
@@ -69,7 +69,7 @@ Names must match **exactly** (capital letters included) — the scripts find eac
 | `Util` | Helpers: distance checks, prompts, rate limiting. |
 | `ItemVisuals` | Turns a part into a coloured block with a name label. |
 | `PlayerData` | Each player's coins, inventory, robots and upgrades (server memory). |
-| `MapBuilder` | Builds the starter map if `Workspace.Map` does not exist. |
+| `MapBuilder` | Builds the map (factory, conveyor, 8 bases, scenery) if `Workspace.Map` does not exist. |
 | `BaseService` | Assigns bases, runs the lock button, knows who is inside a base. |
 | `RobotService` | Placing/removing parts, drawing robots, paying coins every second. |
 | `ConveyorService` | Spawns parts on the belt and sells them. |
@@ -104,7 +104,7 @@ Command Bar will not take such a long paste, use method A.
 3. **Add the scripts** for Step 1: `Config`, `PartCatalog`, `Main`, the ten Step 1 modules in
    `Services`, and `ClientMain`.
 4. **Press Play.** You should see:
-   - a conveyor in the middle with parts sliding along it, and 8 walled bases;
+   - a factory plaza with parts sliding along the conveyor, and 8 walled bases around it;
    - yourself spawning in a base with your name on the sign;
    - a coin counter on the left that goes up by 1 every second.
 5. **Test with this checklist:**
@@ -127,7 +127,7 @@ Command Bar will not take such a long paste, use method A.
    - Player 1 gets a red **ALERT** as soon as Player 2 starts holding, the robot shows `OFFLINE`.
    - Player 2 gets a glowing crate overhead and walks slowly. Reach your own base = the parts
      land in your inventory. If Player 1 touches Player 2 first, the parts snap back.
-   - Player 1: press E on the **red block** inside your door to lock the base. Player 2 is
+   - Player 1: press E on the **red button** (on the pedestal just inside your door) to lock the base. Player 2 is
      thrown out and cannot enter for 30 seconds. The lock then recharges for 60 seconds.
    - Open **Shop** and buy Turbo Boots / Extra Build Pad / Stronger Lock. (Guard Bot says it is
      not installed yet — that is Step 2.)
@@ -193,7 +193,7 @@ To wipe all test data, change `Config.Saving.StoreName` (for example to `"RobARo
 | Steal a whole robot | **Hold F** near a complete robot for 3 seconds |
 | Deliver loot | Walk back into your own base |
 | Catch a thief | Touch them (get within 6 studs) while they carry your parts |
-| Lock your base | Press **E** on the red block by your door |
+| Lock your base | Press **E** on the red button by your door |
 | Shop | **Shop** button |
 
 Whole-robot stealing uses **F** instead of E on purpose: a robot already has five "hold E"
@@ -216,11 +216,28 @@ A robot earns the sum of its five parts, doubled if all five are from one set
 
 ## Building your own map
 
-`MapBuilder` only runs when `Workspace` has no model called **`Map`**. The easy route:
+`MapBuilder` builds the full map for you: a factory plaza with the conveyor, a part dispenser
+and a recycler, light arches, a title sign, 8 colour-coded bases, paths, trees and an outer wall.
 
-1. Press Play. In the Explorer, right-click `Workspace > Map` > **Copy**.
-2. Press Stop. Right-click `Workspace` > **Paste Into**.
-3. The map is now a normal model. Move, resize, recolour and decorate it freely.
+By default it builds the map each time the game starts (only when `Workspace` has no model called
+**`Map`**). To get the map as a **permanent model you can edit**:
+
+1. Make sure the `MapBuilder` ModuleScript is in `ServerScriptService > Services`.
+2. Do **not** press Play. Open View > **Command Bar** and run this one line:
+
+   ```lua
+   require(game.ServerScriptService.Services.MapBuilder).Build()
+   ```
+
+3. `Workspace > Map` appears. Save the place. From now on the game uses this map and you can
+   move, recolour and decorate it by hand.
+
+Everything inside a folder named **`Decor`** is decoration only — change or delete it freely.
+Leave the other parts' names alone. You can keep or delete the default `Baseplate`; the map's
+grass sits just above it. The builder also sets an early-evening look in `Lighting`.
+
+To throw the map away and build a fresh one (hand edits are lost), run the same line ending in
+`.Rebuild()`.
 
 If you build from scratch, the scripts need exactly these names:
 
